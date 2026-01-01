@@ -1,0 +1,43 @@
+[package]
+name = "lumo-daemon"
+version = "0.1.0"
+edition = "2021"
+description = "Lumo privilege daemon for executing privileged operations via Unix socket"
+authors = ["Lumo Team"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Template engine
+tera = "1"
+
+# Cryptography
+ring = "0.17"
+hex = "0.4"
+
+# Unix-specific
+nix = { version = "0.29", features = ["user", "socket", "fs"] }
+users = "0.11"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+
+# Error handling
+thiserror = "1"
+
+# Utilities
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+regex = "1"
+
+[dev-dependencies]
+tempfile = "3"
+tokio-test = "0.4"
+assert_matches = "1.5"

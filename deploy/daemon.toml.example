@@ -1,0 +1,80 @@
+# Lumo Daemon Configuration
+# Copy this file to /etc/lumo/daemon.toml
+
+[socket]
+# Unix socket path
+path = "/var/run/lumo/daemon.sock"
+# Socket permissions (octal)
+permissions = "0660"
+# Socket owner and group
+owner = "root"
+group = "www-data"
+
+[security]
+# Path to HMAC secret file (must have 0600 permissions)
+hmac_secret_path = "/etc/lumo/hmac.key"
+# Nonce TTL in seconds (for replay prevention)
+nonce_ttl_seconds = 300
+# Maximum request age in seconds
+max_request_age_seconds = 60
+# Allowed peer UIDs (fail-closed: empty list rejects all)
+# Use UID of www-data (typically 33 on Debian/Ubuntu)
+allowed_peer_uids = [33]
+
+[redis]
+# Redis connection URL
+url = "redis://127.0.0.1:6379"
+# Connection pool size
+pool_size = 4
+
+[paths]
+# Template directory
+templates_dir = "/etc/lumo/templates"
+# Custom templates directory
+custom_templates_dir = "/etc/lumo/custom_templates"
+# Log directory
+log_dir = "/var/log/lumo"
+
+[logging]
+# Log level: trace, debug, info, warn, error
+level = "info"
+# Log format: json, pretty
+format = "json"
+# Log file (optional, logs to stdout if not set)
+file = "/var/log/lumo/daemon.log"
+
+[limits]
+# Maximum message size in bytes (1MB default)
+max_message_size = 1048576
+# Default command timeout in seconds
+default_timeout_seconds = 60
+# Maximum concurrent connections
+max_concurrent_requests = 100
+
+[audit]
+# Enable audit logging
+enabled = true
+# Audit log path
+log_path = "/var/log/lumo/audit.log"
+
+[whitelists]
+# Additional items to allow beyond the built-in defaults.
+# These extend (not replace) the secure defaults.
+
+# Additional systemd services that can be controlled
+# additional_services = ["custom-service", "other-service"]
+
+# Additional packages that can be installed
+# additional_packages = ["custom-package"]
+
+# Additional PHP versions (built-in: 8.1, 8.2, 8.3, 8.4)
+# additional_php_versions = ["8.5"]
+
+# Additional PHP extensions
+# additional_php_extensions = ["custom-ext"]
+
+# Additional PPA repositories
+# additional_repositories = ["ppa:custom/repo"]
+
+# Additional path prefixes for file operations (must end with /)
+# additional_path_prefixes = ["/opt/custom/"]

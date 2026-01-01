@@ -1,0 +1,33 @@
+# Lumo Daemon Configuration
+# Copy this file to daemon.toml and adjust settings
+
+[socket]
+path = "/var/run/lumo/daemon.sock"
+permissions = "0660"
+owner = "root"
+group = "www-data"
+
+[security]
+hmac_secret_path = "/etc/lumo/hmac.secret"
+nonce_ttl_seconds = 300
+max_request_age_seconds = 60
+allowed_peer_uids = [33]  # www-data UID
+
+[redis]
+url = "redis://127.0.0.1:6379"
+pool_size = 4
+
+[paths]
+templates_dir = "/usr/share/lumo/templates"
+custom_templates_dir = "/etc/lumo/templates"
+log_dir = "/var/log/lumo"
+
+[logging]
+level = "info"
+format = "pretty"  # "pretty" or "json"
+file = "/var/log/lumo/daemon.log"
+
+[limits]
+max_message_size = 1048576  # 1MB
+default_timeout_seconds = 60
+max_concurrent_requests = 100
