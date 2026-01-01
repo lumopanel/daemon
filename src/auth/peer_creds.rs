@@ -22,10 +22,10 @@ pub struct PeerInfo {
 /// Checks the peer's UID against the list of allowed UIDs.
 /// Returns the peer info if authorized.
 #[cfg(target_os = "linux")]
-pub fn verify_peer<S: AsRawFd>(stream: &S, allowed_uids: &[u32]) -> Result<PeerInfo, DaemonError> {
+pub fn verify_peer<S: std::os::fd::AsFd>(stream: &S, allowed_uids: &[u32]) -> Result<PeerInfo, DaemonError> {
     use nix::sys::socket::{getsockopt, sockopt::PeerCredentials};
 
-    let creds = getsockopt(stream.as_raw_fd(), PeerCredentials).map_err(|e| DaemonError::Socket {
+    let creds = getsockopt(stream, PeerCredentials).map_err(|e| DaemonError::Socket {
         message: format!("Failed to get peer credentials: {}", e),
     })?;
 
