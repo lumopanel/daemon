@@ -6,7 +6,9 @@ use tracing::{debug, info};
 
 use crate::error::DaemonError;
 use crate::executor::{run_command_sensitive, SubprocessResult};
-use crate::validation::{validate_database_name, validate_database_type, validate_database_username};
+use crate::validation::{
+    validate_database_name, validate_database_type, validate_database_username,
+};
 
 use super::super::traits::Command;
 use super::super::types::{CommandParams, CommandResult, ExecutionContext};
@@ -92,10 +94,7 @@ impl Command for CreateDatabaseUserCommand {
         } else {
             Ok(CommandResult::failure(
                 "USER_CREATE_FAILED",
-                format!(
-                    "Failed to create database user: {}",
-                    result.stderr.trim()
-                ),
+                format!("Failed to create database user: {}", result.stderr.trim()),
             ))
         }
     }
@@ -134,7 +133,11 @@ fn escape_postgresql_string(s: &str) -> String {
 }
 
 /// Create a MySQL user with access to a database.
-fn create_mysql_user(username: &str, password: &str, database: &str) -> Result<SubprocessResult, DaemonError> {
+fn create_mysql_user(
+    username: &str,
+    password: &str,
+    database: &str,
+) -> Result<SubprocessResult, DaemonError> {
     // Create user and grant privileges in one transaction
     // Using single quotes for password and backticks for identifiers
     // Username and database are validated to contain only safe characters
@@ -143,23 +146,23 @@ fn create_mysql_user(username: &str, password: &str, database: &str) -> Result<S
         "CREATE USER IF NOT EXISTS '{}'@'localhost' IDENTIFIED BY '{}'; \
          GRANT ALL PRIVILEGES ON `{}`.* TO '{}'@'localhost'; \
          FLUSH PRIVILEGES;",
-        username,
-        escaped_password,
-        database,
-        username
+        username, escaped_password, database, username
     );
     run_command_sensitive("mysql", &["-e", &sql], DEFAULT_TIMEOUT)
 }
 
 /// Create a PostgreSQL user with access to a database.
-fn create_postgresql_user(username: &str, password: &str, database: &str) -> Result<SubprocessResult, DaemonError> {
+fn create_postgresql_user(
+    username: &str,
+    password: &str,
+    database: &str,
+) -> Result<SubprocessResult, DaemonError> {
     // Create user first - using E'' syntax for escape string and quoting identifiers
     // Username and database are validated to contain only safe characters
     let escaped_password = escape_postgresql_string(password);
     let create_sql = format!(
         "CREATE USER \"{}\" WITH PASSWORD E'{}';",
-        username,
-        escaped_password
+        username, escaped_password
     );
     let create_result = run_command_sensitive("psql", &["-c", &create_sql], DEFAULT_TIMEOUT)?;
     if !create_result.success {
@@ -169,8 +172,7 @@ fn create_postgresql_user(username: &str, password: &str, database: &str) -> Res
     // Grant privileges on the database - using double quotes for identifiers
     let grant_sql = format!(
         "GRANT ALL PRIVILEGES ON DATABASE \"{}\" TO \"{}\";",
-        database,
-        username
+        database, username
     );
     run_command_sensitive("psql", &["-c", &grant_sql], DEFAULT_TIMEOUT)
 }
@@ -181,6 +183,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

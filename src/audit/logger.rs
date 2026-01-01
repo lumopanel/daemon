@@ -50,10 +50,7 @@ impl AuditLogger {
         }
 
         // Open file in append mode
-        let file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(path)?;
+        let file = OpenOptions::new().create(true).append(true).open(path)?;
 
         debug!(path = %path.display(), "Audit logger initialized");
 

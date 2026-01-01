@@ -33,6 +33,7 @@ pub struct AuditEntry {
 
 impl AuditEntry {
     /// Create a new audit entry for a successful command.
+    #[allow(clippy::too_many_arguments)]
     pub fn success(
         timestamp: String,
         request_id: Uuid,
@@ -58,6 +59,7 @@ impl AuditEntry {
     }
 
     /// Create a new audit entry for a failed command.
+    #[allow(clippy::too_many_arguments)]
     pub fn failure(
         timestamp: String,
         request_id: Uuid,

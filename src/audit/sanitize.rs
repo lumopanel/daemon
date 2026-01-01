@@ -52,14 +52,10 @@ fn sanitize_value(value: &Value, is_truncatable: bool) -> Value {
                 let key_lower = key.to_lowercase();
 
                 // Check if this key contains a sensitive word
-                let is_sensitive = SENSITIVE_KEYS
-                    .iter()
-                    .any(|&s| key_lower.contains(s));
+                let is_sensitive = SENSITIVE_KEYS.iter().any(|&s| key_lower.contains(s));
 
                 // Check if this key's value should be truncatable
-                let should_truncate = TRUNCATABLE_KEYS
-                    .iter()
-                    .any(|&s| key_lower.contains(s));
+                let should_truncate = TRUNCATABLE_KEYS.iter().any(|&s| key_lower.contains(s));
 
                 if is_sensitive {
                     sanitized.insert(key.clone(), Value::String("[REDACTED]".to_string()));
@@ -69,9 +65,11 @@ fn sanitize_value(value: &Value, is_truncatable: bool) -> Value {
             }
             Value::Object(sanitized)
         }
-        Value::Array(arr) => {
-            Value::Array(arr.iter().map(|v| sanitize_value(v, is_truncatable)).collect())
-        }
+        Value::Array(arr) => Value::Array(
+            arr.iter()
+                .map(|v| sanitize_value(v, is_truncatable))
+                .collect(),
+        ),
         Value::String(s) if is_truncatable && s.len() > MAX_STRING_LENGTH => {
             Value::String(format!("[TRUNCATED - {} bytes]", s.len()))
         }

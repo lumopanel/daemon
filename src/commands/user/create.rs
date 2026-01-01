@@ -68,7 +68,8 @@ impl Command for CreateUserCommand {
                 return Err(DaemonError::Validation {
                     kind: crate::error::ValidationErrorKind::InvalidParameter {
                         param: "home_dir".to_string(),
-                        message: "Home directory cannot contain path traversal sequences (..)".to_string(),
+                        message: "Home directory cannot contain path traversal sequences (..)"
+                            .to_string(),
                     },
                 });
             }
@@ -91,16 +92,25 @@ impl Command for CreateUserCommand {
                     return Err(DaemonError::Validation {
                         kind: crate::error::ValidationErrorKind::InvalidParameter {
                             param: "groups".to_string(),
-                            message: format!("Invalid group name '{}': must be 1-32 characters", group),
+                            message: format!(
+                                "Invalid group name '{}': must be 1-32 characters",
+                                group
+                            ),
                         },
                     });
                 }
                 // Only alphanumeric, underscore, hyphen
-                if !group.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') {
+                if !group
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+                {
                     return Err(DaemonError::Validation {
                         kind: crate::error::ValidationErrorKind::InvalidParameter {
                             param: "groups".to_string(),
-                            message: format!("Invalid group name '{}': contains invalid characters", group),
+                            message: format!(
+                                "Invalid group name '{}': contains invalid characters",
+                                group
+                            ),
                         },
                     });
                 }
@@ -177,9 +187,9 @@ impl Command for CreateUserCommand {
             // Parse common useradd exit codes
             let error_message = match exit_code {
                 1 => format!("Cannot update password file for user '{}'", username),
-                2 => format!("Invalid command syntax for useradd"),
-                3 => format!("Invalid argument for useradd option"),
-                4 => format!("UID already in use"),
+                2 => "Invalid command syntax for useradd".to_string(),
+                3 => "Invalid argument for useradd option".to_string(),
+                4 => "UID already in use".to_string(),
                 6 => format!("Group does not exist: {}", stderr.trim()),
                 9 => format!("Username '{}' already exists", username),
                 12 => format!("Cannot create home directory '{}'", home_dir),

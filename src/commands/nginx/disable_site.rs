@@ -104,6 +104,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

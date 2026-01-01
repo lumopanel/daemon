@@ -2,7 +2,7 @@
 
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use tracing::{debug, info};
@@ -90,7 +90,10 @@ impl Command for InstallCertificateCommand {
         let cert_path = PathBuf::from(format!("/etc/ssl/certs/{}.crt", domain));
         let key_path = PathBuf::from(format!("/etc/ssl/private/{}.key", domain));
         let chain_path = if chain.is_some() {
-            Some(PathBuf::from(format!("/etc/ssl/certs/{}.chain.crt", domain)))
+            Some(PathBuf::from(format!(
+                "/etc/ssl/certs/{}.chain.crt",
+                domain
+            )))
         } else {
             None
         };
@@ -196,7 +199,7 @@ impl Command for InstallCertificateCommand {
 }
 
 /// Verify that the certificate and key match.
-fn verify_certificate(cert_path: &PathBuf, key_path: &PathBuf) -> Result<SubprocessResult, DaemonError> {
+fn verify_certificate(cert_path: &Path, key_path: &Path) -> Result<SubprocessResult, DaemonError> {
     // Get certificate modulus
     let cert_result = run_command(
         "openssl",
@@ -255,6 +258,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

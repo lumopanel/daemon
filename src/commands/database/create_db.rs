@@ -78,10 +78,7 @@ impl Command for CreateDatabaseCommand {
         } else {
             Ok(CommandResult::failure(
                 "DATABASE_CREATE_FAILED",
-                format!(
-                    "Failed to create database: {}",
-                    result.stderr.trim()
-                ),
+                format!("Failed to create database: {}", result.stderr.trim()),
             ))
         }
     }
@@ -105,6 +102,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

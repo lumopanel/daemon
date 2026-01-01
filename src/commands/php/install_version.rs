@@ -57,7 +57,10 @@ impl Command for InstallPhpVersionCommand {
         if !update_result.success {
             return Ok(CommandResult::failure(
                 "APT_UPDATE_FAILED",
-                format!("Failed to update package lists: {}", update_result.stderr.trim()),
+                format!(
+                    "Failed to update package lists: {}",
+                    update_result.stderr.trim()
+                ),
             ));
         }
 
@@ -85,7 +88,11 @@ impl Command for InstallPhpVersionCommand {
         } else {
             Ok(CommandResult::failure(
                 "PHP_INSTALL_FAILED",
-                format!("Failed to install PHP {}: {}", version, result.stderr.trim()),
+                format!(
+                    "Failed to install PHP {}: {}",
+                    version,
+                    result.stderr.trim()
+                ),
             ))
         }
     }
@@ -117,11 +124,7 @@ pub fn validate_php_version(version: &str) -> Result<(), DaemonError> {
 
 /// Install packages using apt-get.
 fn install_packages(packages: &[String]) -> Result<SubprocessResult, DaemonError> {
-    let mut args = vec![
-        "install",
-        "-y",
-        "--no-install-recommends",
-    ];
+    let mut args = vec!["install", "-y", "--no-install-recommends"];
 
     let package_refs: Vec<&str> = packages.iter().map(|s| s.as_str()).collect();
     args.extend(package_refs);
@@ -135,6 +138,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

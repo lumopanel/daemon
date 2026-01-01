@@ -7,17 +7,43 @@ use std::sync::LazyLock;
 
 use crate::error::{DaemonError, ValidationErrorKind};
 
-use super::whitelist::{is_additional_package, is_additional_php_extension, is_additional_php_version};
+use super::whitelist::{
+    is_additional_package, is_additional_php_extension, is_additional_php_version,
+};
 
 /// PHP versions supported
 const PHP_VERSIONS: &[&str] = &["8.1", "8.2", "8.3", "8.4"];
 
 /// PHP extensions that can be installed
 const PHP_EXTENSIONS: &[&str] = &[
-    "fpm", "cli", "common", "mysql", "pgsql", "sqlite3", "redis", "memcached",
-    "mongodb", "curl", "gd", "imagick", "intl", "mbstring", "xml", "zip",
-    "bcmath", "soap", "opcache", "readline", "ldap", "imap", "gmp", "xdebug",
-    "dev", "apcu", "igbinary", "msgpack",
+    "fpm",
+    "cli",
+    "common",
+    "mysql",
+    "pgsql",
+    "sqlite3",
+    "redis",
+    "memcached",
+    "mongodb",
+    "curl",
+    "gd",
+    "imagick",
+    "intl",
+    "mbstring",
+    "xml",
+    "zip",
+    "bcmath",
+    "soap",
+    "opcache",
+    "readline",
+    "ldap",
+    "imap",
+    "gmp",
+    "xdebug",
+    "dev",
+    "apcu",
+    "igbinary",
+    "msgpack",
 ];
 
 /// Statically allowed packages (non-PHP).
@@ -100,7 +126,8 @@ pub fn is_package_allowed(name: &str) -> bool {
             let ext = &php_part[dash_pos + 1..];
 
             // Check if version is allowed (built-in or additional)
-            let version_allowed = PHP_VERSIONS.contains(&version) || is_additional_php_version(version);
+            let version_allowed =
+                PHP_VERSIONS.contains(&version) || is_additional_php_version(version);
 
             // Check if extension is allowed (built-in or additional)
             let ext_allowed = PHP_EXTENSIONS.contains(&ext) || is_additional_php_extension(ext);

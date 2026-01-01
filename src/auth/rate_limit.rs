@@ -43,7 +43,7 @@ impl RateLimiter {
         let now = Instant::now();
         let cutoff = now - self.window;
 
-        let entry = requests.entry(uid).or_insert_with(Vec::new);
+        let entry = requests.entry(uid).or_default();
 
         // Remove old requests outside the window
         entry.retain(|&t| t > cutoff);
@@ -88,7 +88,10 @@ impl RateLimiter {
     /// Get the number of UIDs being tracked.
     #[allow(dead_code)]
     pub fn tracked_uids(&self) -> usize {
-        self.requests.lock().unwrap_or_else(|e| e.into_inner()).len()
+        self.requests
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .len()
     }
 
     /// Start a background cleanup task.

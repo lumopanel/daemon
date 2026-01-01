@@ -43,7 +43,7 @@ impl Command for AddRepositoryCommand {
         // Build add-apt-repository command
         let mut cmd = ProcessCommand::new("add-apt-repository");
         cmd.args([
-            "-y",  // Non-interactive
+            "-y", // Non-interactive
             &repository,
         ]);
 
@@ -68,10 +68,7 @@ impl Command for AddRepositoryCommand {
             );
             return Err(DaemonError::Command {
                 kind: CommandErrorKind::ExecutionFailed {
-                    message: format!(
-                        "add-apt-repository failed: {}",
-                        sanitize_output(&stderr, 5)
-                    ),
+                    message: format!("add-apt-repository failed: {}", sanitize_output(&stderr, 5)),
                 },
             });
         }

@@ -14,7 +14,9 @@ use crate::auth::{verify_peer, HmacValidator, PeerInfo, RateLimiter};
 use crate::commands::{CommandParams, CommandRegistry, ExecutionContext};
 use crate::config::Settings;
 use crate::error::{DaemonError, ProtocolErrorKind};
-use crate::protocol::{read_message_with_timeout, write_message_with_timeout, Response, SignedRequest};
+use crate::protocol::{
+    read_message_with_timeout, write_message_with_timeout, Response, SignedRequest,
+};
 
 /// Handle a single client connection.
 pub async fn handle_connection(
@@ -32,12 +34,19 @@ pub async fn handle_connection(
 
     // Verify peer credentials
     let peer = verify_peer(&std_stream, &settings.security.allowed_peer_uids)?;
-    debug!(uid = peer.uid, gid = peer.gid, pid = peer.pid, "Peer authenticated");
+    debug!(
+        uid = peer.uid,
+        gid = peer.gid,
+        pid = peer.pid,
+        "Peer authenticated"
+    );
 
     // Convert back to tokio stream
-    std_stream.set_nonblocking(true).map_err(|e| DaemonError::Socket {
-        message: format!("Failed to set non-blocking: {}", e),
-    })?;
+    std_stream
+        .set_nonblocking(true)
+        .map_err(|e| DaemonError::Socket {
+            message: format!("Failed to set non-blocking: {}", e),
+        })?;
     let stream = UnixStream::from_std(std_stream).map_err(|e| DaemonError::Socket {
         message: format!("Failed to convert back to tokio stream: {}", e),
     })?;
@@ -79,6 +88,7 @@ pub async fn handle_connection(
 }
 
 /// Process a single request from the client.
+#[allow(clippy::too_many_arguments)]
 async fn process_request<R, W>(
     reader: &mut R,
     writer: &mut W,
@@ -95,14 +105,16 @@ where
 {
     // Read the incoming message with timeout
     let socket_timeout = Duration::from_secs(settings.limits.socket_timeout_seconds);
-    let msg = read_message_with_timeout(reader, settings.limits.max_message_size, socket_timeout).await?;
+    let msg =
+        read_message_with_timeout(reader, settings.limits.max_message_size, socket_timeout).await?;
 
     // Parse the request
-    let request: SignedRequest = serde_json::from_slice(&msg).map_err(|e| DaemonError::Protocol {
-        kind: ProtocolErrorKind::InvalidMessageFormat {
-            message: format!("Invalid JSON: {}", e),
-        },
-    })?;
+    let request: SignedRequest =
+        serde_json::from_slice(&msg).map_err(|e| DaemonError::Protocol {
+            kind: ProtocolErrorKind::InvalidMessageFormat {
+                message: format!("Invalid JSON: {}", e),
+            },
+        })?;
 
     let request_id = Uuid::new_v4();
     let start_time = Instant::now();
@@ -150,12 +162,8 @@ where
                 .map(|d| d.as_secs())
                 .unwrap_or(0);
 
-            let ctx = ExecutionContext::new(
-                request_id,
-                peer.clone(),
-                timestamp,
-                request.command.clone(),
-            );
+            let ctx =
+                ExecutionContext::new(request_id, peer.clone(), timestamp, request.command.clone());
 
             // Create command params
             let params = CommandParams::new(request.params.clone());
@@ -186,8 +194,14 @@ where
                     } else {
                         Response::error_with_id(
                             request_id,
-                            cmd_result.error_code.clone().unwrap_or_else(|| "COMMAND_ERROR".to_string()),
-                            cmd_result.error_message.clone().unwrap_or_else(|| "Unknown error".to_string()),
+                            cmd_result
+                                .error_code
+                                .clone()
+                                .unwrap_or_else(|| "COMMAND_ERROR".to_string()),
+                            cmd_result
+                                .error_message
+                                .clone()
+                                .unwrap_or_else(|| "Unknown error".to_string()),
                         )
                     };
 
@@ -215,8 +229,12 @@ where
                                 peer.uid,
                                 peer.gid,
                                 peer.pid,
-                                cmd_result.error_code.unwrap_or_else(|| "COMMAND_ERROR".to_string()),
-                                cmd_result.error_message.unwrap_or_else(|| "Unknown error".to_string()),
+                                cmd_result
+                                    .error_code
+                                    .unwrap_or_else(|| "COMMAND_ERROR".to_string()),
+                                cmd_result
+                                    .error_message
+                                    .unwrap_or_else(|| "Unknown error".to_string()),
                                 duration_ms,
                             )
                         };
@@ -285,7 +303,11 @@ where
                         }
                     }
 
-                    Response::error_with_id(request_id, "INTERNAL_ERROR", "Command execution failed")
+                    Response::error_with_id(
+                        request_id,
+                        "INTERNAL_ERROR",
+                        "Command execution failed",
+                    )
                 }
             }
         }

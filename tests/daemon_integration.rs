@@ -17,8 +17,8 @@ use tempfile::TempDir;
 
 use lumo_daemon::auth::NonceStore;
 use lumo_daemon::config::{
-    AuditConfig, LimitsConfig, LoggingConfig, PathsConfig, RedisConfig,
-    SecurityConfig, Settings, SocketConfig, WhitelistsConfig,
+    AuditConfig, LimitsConfig, LoggingConfig, PathsConfig, RedisConfig, SecurityConfig, Settings,
+    SocketConfig, WhitelistsConfig,
 };
 use lumo_daemon::socket::SocketListener;
 
@@ -133,9 +133,11 @@ impl TestDaemon {
             .map_err(|e| format!("Failed to connect: {}", e))?;
 
         // Use longer timeouts for stability
-        stream.set_read_timeout(Some(Duration::from_secs(30)))
+        stream
+            .set_read_timeout(Some(Duration::from_secs(30)))
             .map_err(|e| format!("Failed to set read timeout: {}", e))?;
-        stream.set_write_timeout(Some(Duration::from_secs(30)))
+        stream
+            .set_write_timeout(Some(Duration::from_secs(30)))
             .map_err(|e| format!("Failed to set write timeout: {}", e))?;
 
         let timestamp = std::time::SystemTime::now()
@@ -160,31 +162,35 @@ impl TestDaemon {
             "signature": signature_hex,
         });
 
-        let request_bytes = serde_json::to_vec(&request)
-            .map_err(|e| format!("Failed to serialize: {}", e))?;
+        let request_bytes =
+            serde_json::to_vec(&request).map_err(|e| format!("Failed to serialize: {}", e))?;
 
         let length = request_bytes.len() as u32;
         eprintln!("Sending {} bytes to daemon...", length);
-        stream.write_all(&length.to_be_bytes())
+        stream
+            .write_all(&length.to_be_bytes())
             .map_err(|e| format!("Failed to write length: {}", e))?;
-        stream.write_all(&request_bytes)
+        stream
+            .write_all(&request_bytes)
             .map_err(|e| format!("Failed to write request: {}", e))?;
-        stream.flush()
+        stream
+            .flush()
             .map_err(|e| format!("Failed to flush: {}", e))?;
         eprintln!("Sent, waiting for response...");
 
         let mut length_bytes = [0u8; 4];
-        stream.read_exact(&mut length_bytes)
+        stream
+            .read_exact(&mut length_bytes)
             .map_err(|e| format!("Failed to read response length: {}", e))?;
         eprintln!("Got response length bytes");
         let response_length = u32::from_be_bytes(length_bytes) as usize;
 
         let mut response_bytes = vec![0u8; response_length];
-        stream.read_exact(&mut response_bytes)
+        stream
+            .read_exact(&mut response_bytes)
             .map_err(|e| format!("Failed to read response: {}", e))?;
 
-        serde_json::from_slice(&response_bytes)
-            .map_err(|e| format!("Failed to parse: {}", e))
+        serde_json::from_slice(&response_bytes).map_err(|e| format!("Failed to parse: {}", e))
     }
 
     /// Send a raw request with custom auth parameters.
@@ -199,9 +205,11 @@ impl TestDaemon {
         let mut stream = UnixStream::connect(&self.socket_path)
             .map_err(|e| format!("Failed to connect: {}", e))?;
 
-        stream.set_read_timeout(Some(Duration::from_secs(30)))
+        stream
+            .set_read_timeout(Some(Duration::from_secs(30)))
             .map_err(|e| format!("Failed to set read timeout: {}", e))?;
-        stream.set_write_timeout(Some(Duration::from_secs(30)))
+        stream
+            .set_write_timeout(Some(Duration::from_secs(30)))
             .map_err(|e| format!("Failed to set write timeout: {}", e))?;
 
         let request = json!({
@@ -212,28 +220,32 @@ impl TestDaemon {
             "signature": signature,
         });
 
-        let request_bytes = serde_json::to_vec(&request)
-            .map_err(|e| format!("Failed to serialize: {}", e))?;
+        let request_bytes =
+            serde_json::to_vec(&request).map_err(|e| format!("Failed to serialize: {}", e))?;
 
         let length = request_bytes.len() as u32;
-        stream.write_all(&length.to_be_bytes())
+        stream
+            .write_all(&length.to_be_bytes())
             .map_err(|e| format!("Failed to write: {}", e))?;
-        stream.write_all(&request_bytes)
+        stream
+            .write_all(&request_bytes)
             .map_err(|e| format!("Failed to write: {}", e))?;
-        stream.flush()
+        stream
+            .flush()
             .map_err(|e| format!("Failed to flush: {}", e))?;
 
         let mut length_bytes = [0u8; 4];
-        stream.read_exact(&mut length_bytes)
+        stream
+            .read_exact(&mut length_bytes)
             .map_err(|e| format!("Failed to read: {}", e))?;
         let response_length = u32::from_be_bytes(length_bytes) as usize;
 
         let mut response_bytes = vec![0u8; response_length];
-        stream.read_exact(&mut response_bytes)
+        stream
+            .read_exact(&mut response_bytes)
             .map_err(|e| format!("Failed to read: {}", e))?;
 
-        serde_json::from_slice(&response_bytes)
-            .map_err(|e| format!("Failed to parse: {}", e))
+        serde_json::from_slice(&response_bytes).map_err(|e| format!("Failed to parse: {}", e))
     }
 
     /// Stop the test daemon.
@@ -276,7 +288,11 @@ async fn test_multiple_requests() {
         let response = daemon.send_request("system.ping", json!({}));
         assert!(response.is_ok(), "Request {} should succeed", i);
         let response = response.unwrap();
-        assert_eq!(response["success"], true, "Request {} response: {:?}", i, response);
+        assert_eq!(
+            response["success"], true,
+            "Request {} response: {:?}",
+            i, response
+        );
     }
 
     daemon.stop().await;
@@ -317,11 +333,23 @@ async fn test_invalid_signature_rejected() {
 
     assert!(response.is_ok());
     let response = response.unwrap();
-    assert_eq!(response["success"], false, "Expected auth failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected auth failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for auth error code or sanitized message
-    assert!(error_code == "AUTH_ERROR" || error_msg.contains("authentication"), "Expected auth error, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "AUTH_ERROR" || error_msg.contains("authentication"),
+        "Expected auth error, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -333,7 +361,8 @@ async fn test_expired_request_rejected() {
     let old_timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
-        .as_secs() - 120;
+        .as_secs()
+        - 120;
     let nonce = uuid::Uuid::new_v4().to_string();
 
     // Format: {command}:{params_json}:{timestamp}:{nonce}
@@ -352,11 +381,23 @@ async fn test_expired_request_rejected() {
 
     assert!(response.is_ok());
     let response = response.unwrap();
-    assert_eq!(response["success"], false, "Expected expired request failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected expired request failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for auth error code or sanitized message
-    assert!(error_code == "AUTH_ERROR" || error_msg.contains("authentication"), "Expected auth error for expired request, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "AUTH_ERROR" || error_msg.contains("authentication"),
+        "Expected auth error for expired request, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -378,33 +419,39 @@ async fn test_nonce_reuse_rejected() {
     let signature_hex = hex::encode(signature.as_ref());
 
     // First request should succeed
-    let response = daemon.send_raw_request(
-        "system.ping",
-        json!({}),
-        timestamp,
-        &nonce,
-        &signature_hex,
-    );
+    let response =
+        daemon.send_raw_request("system.ping", json!({}), timestamp, &nonce, &signature_hex);
     assert!(response.is_ok());
     let first_response = response.unwrap();
-    assert_eq!(first_response["success"], true, "First request should succeed: {:?}", first_response);
+    assert_eq!(
+        first_response["success"], true,
+        "First request should succeed: {:?}",
+        first_response
+    );
 
     // Second request with same nonce should fail
-    let response = daemon.send_raw_request(
-        "system.ping",
-        json!({}),
-        timestamp,
-        &nonce,
-        &signature_hex,
-    );
+    let response =
+        daemon.send_raw_request("system.ping", json!({}), timestamp, &nonce, &signature_hex);
 
     assert!(response.is_ok());
     let response = response.unwrap();
-    assert_eq!(response["success"], false, "Expected nonce reuse failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected nonce reuse failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for auth error code or sanitized message
-    assert!(error_code == "AUTH_ERROR" || error_msg.contains("authentication"), "Expected auth error for nonce reuse, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "AUTH_ERROR" || error_msg.contains("authentication"),
+        "Expected auth error for nonce reuse, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -449,12 +496,28 @@ async fn test_metrics_command() {
 async fn test_unknown_command() {
     let daemon = TestDaemon::start().await;
 
-    let response = daemon.send_request("nonexistent.command", json!({})).unwrap();
-    assert_eq!(response["success"], false, "Expected unknown command failure: {:?}", response);
+    let response = daemon
+        .send_request("nonexistent.command", json!({}))
+        .unwrap();
+    assert_eq!(
+        response["success"], false,
+        "Expected unknown command failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for execution error code or sanitized message
-    assert!(error_code == "EXECUTION_ERROR" || error_msg.contains("execution") || error_msg.contains("error"), "Expected execution error for unknown command, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "EXECUTION_ERROR"
+            || error_msg.contains("execution")
+            || error_msg.contains("error"),
+        "Expected execution error for unknown command, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -463,15 +526,36 @@ async fn test_unknown_command() {
 async fn test_validation_error() {
     let daemon = TestDaemon::start().await;
 
-    let response = daemon.send_request("service.start", json!({
-        "service": "invalid-service"
-    })).unwrap();
+    let response = daemon
+        .send_request(
+            "service.start",
+            json!({
+                "service": "invalid-service"
+            }),
+        )
+        .unwrap();
 
-    assert_eq!(response["success"], false, "Expected validation failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected validation failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for validation error code or sanitized message
-    assert!(error_code == "VALIDATION_ERROR" || error_code == "EXECUTION_ERROR" || error_msg.contains("invalid") || error_msg.contains("request") || error_msg.contains("execution"), "Expected validation error, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "VALIDATION_ERROR"
+            || error_code == "EXECUTION_ERROR"
+            || error_msg.contains("invalid")
+            || error_msg.contains("request")
+            || error_msg.contains("execution"),
+        "Expected validation error, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -481,11 +565,27 @@ async fn test_missing_required_parameter() {
     let daemon = TestDaemon::start().await;
 
     let response = daemon.send_request("service.start", json!({})).unwrap();
-    assert_eq!(response["success"], false, "Expected missing param failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected missing param failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for validation/execution error code or sanitized message
-    assert!(error_code == "VALIDATION_ERROR" || error_code == "EXECUTION_ERROR" || error_msg.contains("invalid") || error_msg.contains("request") || error_msg.contains("execution"), "Expected validation error for missing param, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "VALIDATION_ERROR"
+            || error_code == "EXECUTION_ERROR"
+            || error_msg.contains("invalid")
+            || error_msg.contains("request")
+            || error_msg.contains("execution"),
+        "Expected validation error for missing param, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -494,16 +594,37 @@ async fn test_missing_required_parameter() {
 async fn test_path_validation_protected_file() {
     let daemon = TestDaemon::start().await;
 
-    let response = daemon.send_request("file.write", json!({
-        "path": "/etc/passwd",
-        "content": "test"
-    })).unwrap();
+    let response = daemon
+        .send_request(
+            "file.write",
+            json!({
+                "path": "/etc/passwd",
+                "content": "test"
+            }),
+        )
+        .unwrap();
 
-    assert_eq!(response["success"], false, "Expected protected file failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected protected file failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for validation/execution error code or sanitized message
-    assert!(error_code == "VALIDATION_ERROR" || error_code == "EXECUTION_ERROR" || error_msg.contains("invalid") || error_msg.contains("request") || error_msg.contains("execution"), "Expected validation error for protected file, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "VALIDATION_ERROR"
+            || error_code == "EXECUTION_ERROR"
+            || error_msg.contains("invalid")
+            || error_msg.contains("request")
+            || error_msg.contains("execution"),
+        "Expected validation error for protected file, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -512,16 +633,37 @@ async fn test_path_validation_protected_file() {
 async fn test_path_traversal_blocked() {
     let daemon = TestDaemon::start().await;
 
-    let response = daemon.send_request("file.write", json!({
-        "path": "/tmp/lumo/../../../etc/passwd",
-        "content": "test"
-    })).unwrap();
+    let response = daemon
+        .send_request(
+            "file.write",
+            json!({
+                "path": "/tmp/lumo/../../../etc/passwd",
+                "content": "test"
+            }),
+        )
+        .unwrap();
 
-    assert_eq!(response["success"], false, "Expected path traversal failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected path traversal failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for validation/execution error code or sanitized message
-    assert!(error_code == "VALIDATION_ERROR" || error_code == "EXECUTION_ERROR" || error_msg.contains("invalid") || error_msg.contains("request") || error_msg.contains("execution"), "Expected validation error for path traversal, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "VALIDATION_ERROR"
+            || error_code == "EXECUTION_ERROR"
+            || error_msg.contains("invalid")
+            || error_msg.contains("request")
+            || error_msg.contains("execution"),
+        "Expected validation error for path traversal, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }
@@ -530,15 +672,36 @@ async fn test_path_traversal_blocked() {
 async fn test_package_not_whitelisted() {
     let daemon = TestDaemon::start().await;
 
-    let response = daemon.send_request("package.install", json!({
-        "packages": ["malware-package"]
-    })).unwrap();
+    let response = daemon
+        .send_request(
+            "package.install",
+            json!({
+                "packages": ["malware-package"]
+            }),
+        )
+        .unwrap();
 
-    assert_eq!(response["success"], false, "Expected whitelist failure: {:?}", response);
+    assert_eq!(
+        response["success"], false,
+        "Expected whitelist failure: {:?}",
+        response
+    );
     let error_code = response["error"]["code"].as_str().unwrap_or("");
-    let error_msg = response["error"]["message"].as_str().unwrap_or("").to_lowercase();
+    let error_msg = response["error"]["message"]
+        .as_str()
+        .unwrap_or("")
+        .to_lowercase();
     // Error messages are sanitized - check for validation/execution error code or sanitized message
-    assert!(error_code == "VALIDATION_ERROR" || error_code == "EXECUTION_ERROR" || error_msg.contains("invalid") || error_msg.contains("request") || error_msg.contains("execution"), "Expected validation error for non-whitelisted package, got code: {}, msg: {}", error_code, error_msg);
+    assert!(
+        error_code == "VALIDATION_ERROR"
+            || error_code == "EXECUTION_ERROR"
+            || error_msg.contains("invalid")
+            || error_msg.contains("request")
+            || error_msg.contains("execution"),
+        "Expected validation error for non-whitelisted package, got code: {}, msg: {}",
+        error_code,
+        error_msg
+    );
 
     daemon.stop().await;
 }

@@ -57,10 +57,7 @@ impl Command for EnableNginxSiteCommand {
         if !available_path.exists() {
             return Ok(CommandResult::failure(
                 "SITE_NOT_FOUND",
-                format!(
-                    "Site configuration not found: {}",
-                    available_path.display()
-                ),
+                format!("Site configuration not found: {}", available_path.display()),
             ));
         }
 
@@ -134,6 +131,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

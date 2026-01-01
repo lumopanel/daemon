@@ -44,10 +44,12 @@ impl Command for InstallPackageCommand {
         let mut cmd = ProcessCommand::new("apt-get");
         cmd.args([
             "install",
-            "-y",                          // Non-interactive
-            "--no-install-recommends",     // Minimize attack surface
-            "-o", "Dpkg::Options::=--force-confdef",
-            "-o", "Dpkg::Options::=--force-confold",
+            "-y",                      // Non-interactive
+            "--no-install-recommends", // Minimize attack surface
+            "-o",
+            "Dpkg::Options::=--force-confdef",
+            "-o",
+            "Dpkg::Options::=--force-confold",
         ]);
         cmd.args(&packages);
 
@@ -72,10 +74,7 @@ impl Command for InstallPackageCommand {
             );
             return Err(DaemonError::Command {
                 kind: CommandErrorKind::ExecutionFailed {
-                    message: format!(
-                        "apt-get install failed: {}",
-                        sanitize_output(&stderr, 5)
-                    ),
+                    message: format!("apt-get install failed: {}", sanitize_output(&stderr, 5)),
                 },
             });
         }

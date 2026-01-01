@@ -37,11 +37,15 @@ impl Command for WritePhpIniCommand {
         validate_php_version(&version)?;
 
         // Validate settings is an object
-        let settings = params.as_value().get("settings").ok_or_else(|| DaemonError::Validation {
-            kind: crate::error::ValidationErrorKind::MissingParameter {
-                param: "settings".to_string(),
-            },
-        })?;
+        let settings =
+            params
+                .as_value()
+                .get("settings")
+                .ok_or_else(|| DaemonError::Validation {
+                    kind: crate::error::ValidationErrorKind::MissingParameter {
+                        param: "settings".to_string(),
+                    },
+                })?;
 
         if !settings.is_object() {
             return Err(DaemonError::Validation {
@@ -68,7 +72,11 @@ impl Command for WritePhpIniCommand {
         params: CommandParams,
     ) -> Result<CommandResult, DaemonError> {
         let version = params.get_string("version")?;
-        let settings = params.as_value().get("settings").cloned().unwrap_or_default();
+        let settings = params
+            .as_value()
+            .get("settings")
+            .cloned()
+            .unwrap_or_default();
 
         // Re-validate for safety
         validate_php_version(&version)?;
@@ -89,7 +97,13 @@ impl Command for WritePhpIniCommand {
                 let value_str = match value {
                     serde_json::Value::String(s) => s.clone(),
                     serde_json::Value::Number(n) => n.to_string(),
-                    serde_json::Value::Bool(b) => if *b { "On".to_string() } else { "Off".to_string() },
+                    serde_json::Value::Bool(b) => {
+                        if *b {
+                            "On".to_string()
+                        } else {
+                            "Off".to_string()
+                        }
+                    }
                     _ => value.to_string(),
                 };
                 ini_content.push_str(&format!("{} = {}\n", key, value_str));
@@ -97,10 +111,7 @@ impl Command for WritePhpIniCommand {
         }
 
         // Determine the path
-        let ini_path = PathBuf::from(format!(
-            "/etc/php/{}/fpm/conf.d/99-custom.ini",
-            version
-        ));
+        let ini_path = PathBuf::from(format!("/etc/php/{}/fpm/conf.d/99-custom.ini", version));
 
         // Validate path
         validate_path(&ini_path)?;
@@ -212,6 +223,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

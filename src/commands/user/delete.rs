@@ -92,8 +92,11 @@ impl Command for DeleteUserCommand {
 
             // Parse common userdel exit codes
             let error_message = match exit_code {
-                1 => format!("Cannot update password file when deleting user '{}'", username),
-                2 => format!("Invalid command syntax for userdel"),
+                1 => format!(
+                    "Cannot update password file when deleting user '{}'",
+                    username
+                ),
+                2 => "Invalid command syntax for userdel".to_string(),
                 6 => format!("User '{}' does not exist", username),
                 8 => format!("User '{}' is currently logged in", username),
                 10 => format!("Cannot update group file when deleting user '{}'", username),

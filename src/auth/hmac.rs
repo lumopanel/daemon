@@ -20,11 +20,7 @@ pub struct HmacValidator {
 
 impl HmacValidator {
     /// Create a new HMAC validator.
-    pub fn new(
-        secret: &[u8],
-        nonce_store: Arc<NonceStore>,
-        max_age_seconds: u64,
-    ) -> Self {
+    pub fn new(secret: &[u8], nonce_store: Arc<NonceStore>, max_age_seconds: u64) -> Self {
         let key = hmac::Key::new(hmac::HMAC_SHA256, secret);
         Self {
             key,
@@ -41,7 +37,11 @@ impl HmacValidator {
         // Check file permissions first
         let metadata = std::fs::metadata(path).map_err(|e| DaemonError::Auth {
             kind: AuthErrorKind::HmacSecretError {
-                message: format!("Failed to read HMAC secret metadata from {}: {}", path.display(), e),
+                message: format!(
+                    "Failed to read HMAC secret metadata from {}: {}",
+                    path.display(),
+                    e
+                ),
             },
         })?;
 

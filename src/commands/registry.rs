@@ -27,11 +27,11 @@ use super::service::{
 };
 use super::ssl::{InstallCertificateCommand, RequestLetsEncryptCommand};
 use super::system::{MetricsCommand, PingCommand};
+use super::traits::Command;
+use super::types::{CommandParams, CommandResult, ExecutionContext};
 use super::user::{CreateUserCommand, DeleteUserCommand};
 use crate::auth::NonceStore;
 use crate::socket::ConnectionMetrics;
-use super::traits::Command;
-use super::types::{CommandParams, CommandResult, ExecutionContext};
 
 /// Registry of all available commands.
 #[derive(Clone)]
@@ -133,13 +133,14 @@ impl CommandRegistry {
         params: CommandParams,
     ) -> Result<CommandResult, DaemonError> {
         // Look up the command
-        let command = self.commands.get(command_name).ok_or_else(|| {
-            DaemonError::Command {
+        let command = self
+            .commands
+            .get(command_name)
+            .ok_or_else(|| DaemonError::Command {
                 kind: CommandErrorKind::UnknownCommand {
                     name: command_name.to_string(),
                 },
-            }
-        })?;
+            })?;
 
         // Validate parameters
         command.validate(&params)?;

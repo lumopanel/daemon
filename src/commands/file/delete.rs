@@ -52,7 +52,8 @@ impl Command for DeleteFileCommand {
         if path.is_dir() {
             return Err(DaemonError::Command {
                 kind: CommandErrorKind::ExecutionFailed {
-                    message: "Cannot delete directories with file.delete, use file.rmdir".to_string(),
+                    message: "Cannot delete directories with file.delete, use file.rmdir"
+                        .to_string(),
                 },
             });
         }

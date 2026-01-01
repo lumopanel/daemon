@@ -193,11 +193,13 @@ pub fn validate_path(path: impl AsRef<Path>) -> Result<PathBuf, DaemonError> {
     };
 
     // Canonicalize the existing portion of the path
-    let canonical = check_path.canonicalize().map_err(|_| DaemonError::Validation {
-        kind: ValidationErrorKind::PathNotAllowed {
-            path: path.to_path_buf(),
-        },
-    })?;
+    let canonical = check_path
+        .canonicalize()
+        .map_err(|_| DaemonError::Validation {
+            kind: ValidationErrorKind::PathNotAllowed {
+                path: path.to_path_buf(),
+            },
+        })?;
 
     // Reconstruct the full canonical path for new files
     let full_canonical = if is_new_file {
@@ -214,11 +216,14 @@ pub fn validate_path(path: impl AsRef<Path>) -> Result<PathBuf, DaemonError> {
             canonical.join(file_name)
         } else {
             // Need to add back the non-existent intermediate path components
-            let existing_ancestor = check_path.canonicalize().map_err(|_| DaemonError::Validation {
-                kind: ValidationErrorKind::PathNotAllowed {
-                    path: path.to_path_buf(),
-                },
-            })?;
+            let existing_ancestor =
+                check_path
+                    .canonicalize()
+                    .map_err(|_| DaemonError::Validation {
+                        kind: ValidationErrorKind::PathNotAllowed {
+                            path: path.to_path_buf(),
+                        },
+                    })?;
 
             // Strip the existing ancestor from the original path to get relative part
             let original_abs = if path.is_absolute() {

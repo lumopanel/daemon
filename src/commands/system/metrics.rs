@@ -29,10 +29,7 @@ pub struct MetricsCommand {
 
 impl MetricsCommand {
     /// Create a new metrics command.
-    pub fn new(
-        metrics: Arc<ConnectionMetrics>,
-        nonce_store: Arc<NonceStore>,
-    ) -> Self {
+    pub fn new(metrics: Arc<ConnectionMetrics>, nonce_store: Arc<NonceStore>) -> Self {
         Self {
             start_time: Instant::now(),
             metrics,

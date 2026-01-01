@@ -70,11 +70,7 @@ impl Command for RemovePackageCommand {
             );
             return Err(DaemonError::Command {
                 kind: CommandErrorKind::ExecutionFailed {
-                    message: format!(
-                        "apt-get {} failed: {}",
-                        action,
-                        sanitize_output(&stderr, 5)
-                    ),
+                    message: format!("apt-get {} failed: {}", action, sanitize_output(&stderr, 5)),
                 },
             });
         }

@@ -13,6 +13,8 @@ mod control;
 mod enable;
 mod status;
 
-pub use control::{ReloadServiceCommand, RestartServiceCommand, StartServiceCommand, StopServiceCommand};
+pub use control::{
+    ReloadServiceCommand, RestartServiceCommand, StartServiceCommand, StopServiceCommand,
+};
 pub use enable::{DisableServiceCommand, EnableServiceCommand};
 pub use status::StatusServiceCommand;

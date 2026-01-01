@@ -27,9 +27,8 @@ const ALLOWED_PPAS: &[&str] = &[
 ];
 
 /// Lazily computed set of allowed repositories.
-static ALLOWED_REPOSITORIES: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    ALLOWED_PPAS.iter().copied().collect()
-});
+static ALLOWED_REPOSITORIES: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| ALLOWED_PPAS.iter().copied().collect());
 
 /// Check if a repository is in the allowed whitelist.
 pub fn is_repository_allowed(repo: &str) -> bool {
@@ -57,8 +56,10 @@ pub fn validate_repository(repo: &str) -> Result<(), DaemonError> {
     }
 
     // Check for dangerous characters (shell metacharacters)
-    const DANGEROUS_CHARS: &[char] = &[';', '|', '&', '$', '`', '(', ')', '{', '}', '[', ']',
-                                        '<', '>', '\n', '\r', '\\', '"', '\'', '*', '?', '!'];
+    const DANGEROUS_CHARS: &[char] = &[
+        ';', '|', '&', '$', '`', '(', ')', '{', '}', '[', ']', '<', '>', '\n', '\r', '\\', '"',
+        '\'', '*', '?', '!',
+    ];
 
     if repo.chars().any(|c| DANGEROUS_CHARS.contains(&c)) {
         return Err(DaemonError::Validation {

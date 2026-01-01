@@ -59,10 +59,7 @@ impl Command for UpdatePackageCommand {
             );
             return Err(DaemonError::Command {
                 kind: CommandErrorKind::ExecutionFailed {
-                    message: format!(
-                        "apt-get update failed: {}",
-                        sanitize_output(&stderr, 5)
-                    ),
+                    message: format!("apt-get update failed: {}", sanitize_output(&stderr, 5)),
                 },
             });
         }

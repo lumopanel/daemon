@@ -19,10 +19,7 @@ impl ServiceDefinition for SupervisorService {
     }
 
     fn config_paths(&self) -> Vec<&'static str> {
-        vec![
-            "/etc/supervisor/supervisord.conf",
-            "/etc/supervisor/conf.d",
-        ]
+        vec!["/etc/supervisor/supervisord.conf", "/etc/supervisor/conf.d"]
     }
 
     fn config_template(&self) -> Option<&'static str> {

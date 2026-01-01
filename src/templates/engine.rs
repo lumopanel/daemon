@@ -29,7 +29,11 @@ impl TemplateEngine {
         debug!(pattern = %pattern_str, "Loading templates");
 
         let tera = Tera::new(&pattern_str).map_err(|e| DaemonError::Template {
-            message: format!("Failed to load templates from '{}': {}", template_dir.display(), e),
+            message: format!(
+                "Failed to load templates from '{}': {}",
+                template_dir.display(),
+                e
+            ),
         })?;
 
         let template_count = tera.get_template_names().count();

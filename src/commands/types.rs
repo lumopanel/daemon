@@ -38,7 +38,10 @@ impl CommandParams {
 
     /// Get an optional string parameter.
     pub fn get_optional_string(&self, key: &str) -> Option<String> {
-        self.inner.get(key).and_then(|v| v.as_str()).map(|s| s.to_string())
+        self.inner
+            .get(key)
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
     }
 
     /// Get a required boolean parameter.
@@ -97,14 +100,11 @@ impl CommandParams {
 
     /// Get an optional array of strings.
     pub fn get_optional_string_array(&self, key: &str) -> Option<Vec<String>> {
-        self.inner
-            .get(key)
-            .and_then(|v| v.as_array())
-            .map(|arr| {
-                arr.iter()
-                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                    .collect()
-            })
+        self.inner.get(key).and_then(|v| v.as_array()).map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                .collect()
+        })
     }
 
     /// Get an optional boolean parameter.

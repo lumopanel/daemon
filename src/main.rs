@@ -67,7 +67,10 @@ fn main() -> ExitCode {
 }
 
 /// Async main function.
-async fn async_main(settings: Settings, config_path: String) -> Result<(), Box<dyn std::error::Error>> {
+async fn async_main(
+    settings: Settings,
+    config_path: String,
+) -> Result<(), Box<dyn std::error::Error>> {
     let settings = Arc::new(std::sync::RwLock::new(settings));
 
     // Create the nonce store for replay attack prevention
@@ -78,10 +81,9 @@ async fn async_main(settings: Settings, config_path: String) -> Result<(), Box<d
     nonce_store.start_cleanup_task(Duration::from_secs(60));
 
     // Create and bind the socket listener
-    let listener = SocketListener::bind(
-        Arc::new(settings.read().unwrap().clone()),
-        Arc::clone(&nonce_store),
-    ).await?;
+    let settings_snapshot = settings.read().unwrap().clone();
+    let listener =
+        SocketListener::bind(Arc::new(settings_snapshot), Arc::clone(&nonce_store)).await?;
 
     // Create shutdown notification
     let shutdown = Arc::new(Notify::new());

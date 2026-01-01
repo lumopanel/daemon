@@ -136,7 +136,8 @@ impl SocketListener {
         let metrics = Arc::new(ConnectionMetrics::new());
 
         // Create connection semaphore for limiting concurrent connections
-        let connection_semaphore = Arc::new(Semaphore::new(settings.limits.max_concurrent_requests));
+        let connection_semaphore =
+            Arc::new(Semaphore::new(settings.limits.max_concurrent_requests));
         info!(
             max_connections = settings.limits.max_concurrent_requests,
             "Connection limiting enabled"

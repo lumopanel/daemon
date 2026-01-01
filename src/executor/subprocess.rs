@@ -76,7 +76,8 @@ impl SubprocessBuilder {
         I: IntoIterator<Item = S>,
         S: AsRef<str>,
     {
-        self.args.extend(args.into_iter().map(|s| s.as_ref().to_string()));
+        self.args
+            .extend(args.into_iter().map(|s| s.as_ref().to_string()));
         self
     }
 
@@ -321,22 +322,13 @@ mod tests {
 
     #[test]
     fn test_nonexistent_command() {
-        let result = run_command(
-            "nonexistent_command_12345",
-            &[],
-            Duration::from_secs(5),
-        );
+        let result = run_command("nonexistent_command_12345", &[], Duration::from_secs(5));
         assert!(result.is_err());
     }
 
     #[test]
     fn test_stderr_capture() {
-        let result = run_command(
-            "sh",
-            &["-c", "echo error >&2"],
-            Duration::from_secs(5),
-        )
-        .unwrap();
+        let result = run_command("sh", &["-c", "echo error >&2"], Duration::from_secs(5)).unwrap();
 
         assert!(result.success);
         assert_eq!(result.stderr.trim(), "error");

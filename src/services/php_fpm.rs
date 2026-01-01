@@ -30,12 +30,7 @@ impl ServiceDefinition for PhpFpmService {
     fn systemd_units(&self) -> Vec<&'static str> {
         // We can't return a reference to the dynamic unit_name,
         // so we return common PHP-FPM unit patterns
-        vec![
-            "php8.1-fpm",
-            "php8.2-fpm",
-            "php8.3-fpm",
-            "php8.4-fpm",
-        ]
+        vec!["php8.1-fpm", "php8.2-fpm", "php8.3-fpm", "php8.4-fpm"]
     }
 
     fn config_paths(&self) -> Vec<&'static str> {

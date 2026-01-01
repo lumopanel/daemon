@@ -125,6 +125,8 @@ mod tests {
         assert!(wl.additional_php_versions.contains("8.5"));
         assert!(wl.additional_php_extensions.contains("custom-ext"));
         assert!(wl.additional_repositories.contains("ppa:custom/repo"));
-        assert!(wl.additional_path_prefixes.contains(&"/custom/path/".to_string()));
+        assert!(wl
+            .additional_path_prefixes
+            .contains(&"/custom/path/".to_string()));
     }
 }

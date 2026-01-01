@@ -79,7 +79,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }),
         secret,
     )?;
-    println!("Cleanup template file: {}\n", serde_json::to_string_pretty(&response)?);
+    println!(
+        "Cleanup template file: {}\n",
+        serde_json::to_string_pretty(&response)?
+    );
 
     // Test 5: Path traversal attack (should be rejected)
     println!("Test 5: Path traversal rejection");
@@ -122,11 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Test 9: Package update (will fail on macOS but validates correctly)
     println!("Test 9: package.update (validation test)");
-    let response = send_request(
-        "package.update",
-        serde_json::json!({}),
-        secret,
-    )?;
+    let response = send_request("package.update", serde_json::json!({}), secret)?;
     println!("Response: {}\n", serde_json::to_string_pretty(&response)?);
 
     // Test 10: Unknown package rejection
@@ -151,9 +150,7 @@ fn send_request(
 ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
     let mut stream = UnixStream::connect("/tmp/lumo-daemon.sock")?;
 
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)?
-        .as_secs();
+    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
     let nonce = uuid::Uuid::new_v4().to_string();
 
     // Create the message to sign

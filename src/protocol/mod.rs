@@ -15,4 +15,6 @@ mod wire;
 
 pub use request::SignedRequest;
 pub use response::{ErrorResponse, Response};
-pub use wire::{read_message, read_message_with_timeout, write_message, write_message_with_timeout};
+pub use wire::{
+    read_message, read_message_with_timeout, write_message, write_message_with_timeout,
+};

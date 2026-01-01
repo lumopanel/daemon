@@ -5,29 +5,16 @@
 use crate::error::{DaemonError, ValidationErrorKind};
 
 /// Allowed prefixes for document root paths.
-const ALLOWED_DOCROOT_PREFIXES: &[&str] = &[
-    "/var/www/",
-    "/home/",
-    "/srv/",
-];
+const ALLOWED_DOCROOT_PREFIXES: &[&str] = &["/var/www/", "/home/", "/srv/"];
 
 /// Allowed prefixes for PHP socket paths.
-const ALLOWED_SOCKET_PREFIXES: &[&str] = &[
-    "/var/run/",
-    "/run/",
-];
+const ALLOWED_SOCKET_PREFIXES: &[&str] = &["/var/run/", "/run/"];
 
 /// Allowed prefixes for nginx include files.
-const ALLOWED_INCLUDE_PREFIXES: &[&str] = &[
-    "/etc/nginx/",
-];
+const ALLOWED_INCLUDE_PREFIXES: &[&str] = &["/etc/nginx/"];
 
 /// Allowed prefixes for SSL certificate paths.
-const ALLOWED_SSL_PREFIXES: &[&str] = &[
-    "/etc/ssl/",
-    "/etc/letsencrypt/",
-    "/etc/nginx/ssl/",
-];
+const ALLOWED_SSL_PREFIXES: &[&str] = &["/etc/ssl/", "/etc/letsencrypt/", "/etc/nginx/ssl/"];
 
 /// Validates a document root path for nginx configuration.
 ///
@@ -46,7 +33,7 @@ const ALLOWED_SSL_PREFIXES: &[&str] = &[
 ///
 /// The validated path or an error.
 pub fn validate_document_root(path: &str) -> Result<&str, DaemonError> {
-    validate_template_path(path, "document_root", &ALLOWED_DOCROOT_PREFIXES)
+    validate_template_path(path, "document_root", ALLOWED_DOCROOT_PREFIXES)
 }
 
 /// Validates a PHP socket path for nginx configuration.
@@ -66,7 +53,7 @@ pub fn validate_document_root(path: &str) -> Result<&str, DaemonError> {
 ///
 /// The validated path or an error.
 pub fn validate_php_socket(path: &str) -> Result<&str, DaemonError> {
-    let path = validate_template_path(path, "php_socket", &ALLOWED_SOCKET_PREFIXES)?;
+    let path = validate_template_path(path, "php_socket", ALLOWED_SOCKET_PREFIXES)?;
 
     // Must end with .sock
     if !path.ends_with(".sock") {
@@ -98,7 +85,7 @@ pub fn validate_php_socket(path: &str) -> Result<&str, DaemonError> {
 ///
 /// The validated path or an error.
 pub fn validate_custom_config_file(path: &str) -> Result<&str, DaemonError> {
-    let path = validate_template_path(path, "custom_config_file", &ALLOWED_INCLUDE_PREFIXES)?;
+    let path = validate_template_path(path, "custom_config_file", ALLOWED_INCLUDE_PREFIXES)?;
 
     // Must end with .conf
     if !path.ends_with(".conf") {
@@ -130,7 +117,7 @@ pub fn validate_custom_config_file(path: &str) -> Result<&str, DaemonError> {
 ///
 /// The validated path or an error.
 pub fn validate_ssl_certificate(path: &str) -> Result<&str, DaemonError> {
-    let path = validate_template_path(path, "ssl_certificate", &ALLOWED_SSL_PREFIXES)?;
+    let path = validate_template_path(path, "ssl_certificate", ALLOWED_SSL_PREFIXES)?;
 
     // Must end with valid extension
     if !path.ends_with(".pem") && !path.ends_with(".crt") && !path.ends_with(".cer") {
@@ -162,7 +149,7 @@ pub fn validate_ssl_certificate(path: &str) -> Result<&str, DaemonError> {
 ///
 /// The validated path or an error.
 pub fn validate_ssl_certificate_key(path: &str) -> Result<&str, DaemonError> {
-    let path = validate_template_path(path, "ssl_certificate_key", &ALLOWED_SSL_PREFIXES)?;
+    let path = validate_template_path(path, "ssl_certificate_key", ALLOWED_SSL_PREFIXES)?;
 
     // Must end with valid extension
     if !path.ends_with(".pem") && !path.ends_with(".key") {
@@ -244,7 +231,9 @@ fn validate_template_path<'a>(
     }
 
     // Check prefix
-    let has_valid_prefix = allowed_prefixes.iter().any(|prefix| path.starts_with(prefix));
+    let has_valid_prefix = allowed_prefixes
+        .iter()
+        .any(|prefix| path.starts_with(prefix));
     if !has_valid_prefix {
         return Err(DaemonError::Validation {
             kind: ValidationErrorKind::InvalidParameter {
@@ -331,7 +320,9 @@ mod tests {
     #[test]
     fn test_valid_ssl_certificate() {
         assert!(validate_ssl_certificate("/etc/ssl/certs/example.pem").is_ok());
-        assert!(validate_ssl_certificate("/etc/letsencrypt/live/example.com/fullchain.pem").is_ok());
+        assert!(
+            validate_ssl_certificate("/etc/letsencrypt/live/example.com/fullchain.pem").is_ok()
+        );
         assert!(validate_ssl_certificate("/etc/nginx/ssl/cert.crt").is_ok());
     }
 
@@ -349,7 +340,9 @@ mod tests {
     #[test]
     fn test_valid_ssl_certificate_key() {
         assert!(validate_ssl_certificate_key("/etc/ssl/private/example.key").is_ok());
-        assert!(validate_ssl_certificate_key("/etc/letsencrypt/live/example.com/privkey.pem").is_ok());
+        assert!(
+            validate_ssl_certificate_key("/etc/letsencrypt/live/example.com/privkey.pem").is_ok()
+        );
     }
 
     #[test]

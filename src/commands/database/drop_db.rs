@@ -82,10 +82,7 @@ impl Command for DropDatabaseCommand {
         } else {
             Ok(CommandResult::failure(
                 "DATABASE_DROP_FAILED",
-                format!(
-                    "Failed to drop database: {}",
-                    result.stderr.trim()
-                ),
+                format!("Failed to drop database: {}", result.stderr.trim()),
             ))
         }
     }
@@ -110,6 +107,7 @@ mod tests {
     use crate::auth::PeerInfo;
     use uuid::Uuid;
 
+    #[allow(dead_code)]
     fn create_test_context() -> ExecutionContext {
         ExecutionContext::new(
             Uuid::new_v4(),

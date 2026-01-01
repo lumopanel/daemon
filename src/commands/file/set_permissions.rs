@@ -148,7 +148,11 @@ fn set_permissions_recursive(path: &Path, mode: u32) -> Result<usize, DaemonErro
         // Security: Use symlink_metadata to NOT follow symlinks
         let metadata = fs::symlink_metadata(&entry_path).map_err(|e| DaemonError::Command {
             kind: CommandErrorKind::ExecutionFailed {
-                message: format!("Failed to read metadata for {}: {}", entry_path.display(), e),
+                message: format!(
+                    "Failed to read metadata for {}: {}",
+                    entry_path.display(),
+                    e
+                ),
             },
         })?;
 
