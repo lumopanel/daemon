@@ -2,6 +2,7 @@
 //!
 //! Verifies that the connecting process is running as an allowed UID.
 
+#[cfg(target_os = "macos")]
 use std::os::unix::io::AsRawFd;
 
 use crate::error::{AuthErrorKind, DaemonError};
