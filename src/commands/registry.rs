@@ -18,8 +18,8 @@ use super::package::{
     AddRepositoryCommand, InstallPackageCommand, RemovePackageCommand, UpdatePackageCommand,
 };
 use super::php::{
-    InstallPhpExtensionCommand, InstallPhpVersionCommand, RemovePhpVersionCommand,
-    WritePhpIniCommand,
+    InstallPhpExtensionCommand, InstallPhpVersionCommand, RemovePhpExtensionCommand,
+    RemovePhpVersionCommand, WritePhpIniCommand,
 };
 use super::service::{
     DisableServiceCommand, EnableServiceCommand, ReloadServiceCommand, RestartServiceCommand,
@@ -94,6 +94,7 @@ impl CommandRegistry {
         registry.register(Arc::new(InstallPhpVersionCommand));
         registry.register(Arc::new(RemovePhpVersionCommand));
         registry.register(Arc::new(InstallPhpExtensionCommand));
+        registry.register(Arc::new(RemovePhpExtensionCommand));
         registry.register(Arc::new(WritePhpIniCommand));
 
         // Nginx commands
@@ -214,6 +215,7 @@ mod tests {
         assert!(registry.get("php.install_version").is_some());
         assert!(registry.get("php.remove_version").is_some());
         assert!(registry.get("php.install_extension").is_some());
+        assert!(registry.get("php.remove_extension").is_some());
         assert!(registry.get("php.write_ini").is_some());
         // Nginx commands
         assert!(registry.get("nginx.enable_site").is_some());
