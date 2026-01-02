@@ -18,8 +18,10 @@ jobs:
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
+            artifact_name: x86_64-linux
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
+            artifact_name: aarch64-linux
 
     steps:
       - name: Checkout code
@@ -77,17 +79,17 @@ jobs:
             cp -r templates "$STAGING_DIR/"
           fi
           cd "$STAGING_DIR"
-          tar -czvf ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz *
-          sha256sum ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz > ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz.sha256
+          tar -czvf ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}.tar.gz *
+          sha256sum ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}.tar.gz > ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}.tar.gz.sha256
           mv *.tar.gz *.sha256 "$GITHUB_WORKSPACE/"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
+          name: ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}
           path: |
-            ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz
-            ${{ env.BINARY_NAME }}-${{ matrix.target }}.tar.gz.sha256
+            ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}.tar.gz
+            ${{ env.BINARY_NAME }}-${{ matrix.artifact_name }}.tar.gz.sha256
 
   release:
     name: Create Release
