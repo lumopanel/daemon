@@ -23,9 +23,9 @@ LimitNPROC=4096
 
 # Security hardening
 NoNewPrivileges=false
-ProtectSystem=strict
+ProtectSystem=full
 ProtectHome=read-only
-ReadWritePaths=/var/run/lumo /var/log/lumo /tmp/lumo /etc/nginx /etc/php /var/www
+ReadWritePaths=/var/run/lumo /var/log/lumo /tmp/lumo /etc/nginx /etc/php /var/www /etc/letsencrypt
 PrivateTmp=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
